@@ -2,7 +2,7 @@ import { Link, Outlet, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../store/store.ts";
 import NewGameButton from "../components/NewGameButton.tsx";
 import { useEffect } from "react";
-import { selectGameId } from "../store/gameInstanceSlice.ts";
+import { resetSelectedGame, selectGameId } from "../store/gameInstanceSlice.ts";
 import GameSummaryCard from "../components/gameSummary/GameSummaryCard.tsx";
 import RemoveWithConfirm from "../components/RemoveWithConfirm.tsx";
 import { removeGame } from "../store/gamesSlice.ts";
@@ -10,6 +10,7 @@ import { removeGame } from "../store/gamesSlice.ts";
 export default function Games() {
     const { gameId } = useParams();
     const games = useAppSelector((state) => state.games);
+    const selectedGameId = useAppSelector((state) => state.gameInstance.gameId);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -38,6 +39,9 @@ export default function Games() {
                                                 postfix="game"
                                                 confirmCB={(id) => {
                                                     dispatch(removeGame(id));
+                                                    if (selectedGameId === id) {
+                                                        dispatch(resetSelectedGame());
+                                                    }
                                                 }}
                                             />
                                             <Link

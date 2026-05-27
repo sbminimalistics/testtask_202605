@@ -44,6 +44,13 @@ export const gameInstanceSlice = createSlice({
         selectGameId: (state, action) => {
             state.gameId = action.payload;
         },
+        resetSelectedGame: (state) => {
+            state.gameId = initialGameInstance.gameId;
+            state.gameState = initialGameInstance.gameState;
+            state.quests = initialGameInstance.quests;
+            state.reputation = initialGameInstance.reputation;
+            state.gameOver = initialGameInstance.gameOver;
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(
@@ -100,4 +107,5 @@ export const gameInstanceSlice = createSlice({
     },
 });
 
-export const { gameOver, selectGameId } = gameInstanceSlice.actions;
+export const { gameOver, selectGameId, resetSelectedGame } =
+    gameInstanceSlice.actions;
