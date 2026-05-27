@@ -31,20 +31,23 @@ export default function Games() {
                                     gameId={g.gameId}
                                     cardData={g.state}
                                     children={
-                                        <div className="flex gap-1 items-end justify-between flex-wrap">
+                                        // <div className="flex gap-1 items-end justify-between flex-wrap">
+                                        <>
                                             <RemoveWithConfirm
                                                 id={g.gameId}
+                                                postfix="game"
                                                 confirmCB={(id) => {
-                                                    dispatch(removeGame(gameId));
+                                                    dispatch(removeGame(id));
                                                 }}
                                             />
                                             <Link
-                                                to={g.gameId}
-                                                className="content_button ml-auto"
+                                                to={`${g.gameId}/messages`}
+                                                className="content_button"
                                             >
                                                 select
                                             </Link>
-                                        </div>
+                                            {/* </div> */}
+                                        </>
                                     }
                                 />
                             ))}
