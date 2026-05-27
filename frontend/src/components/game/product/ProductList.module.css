@@ -1,0 +1,40 @@
+.product-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+  column-gap: 1rem;
+}
+.product-list h5 {
+  flex: 1 0 100%;
+}
+
+.product-card {
+  flex: 1 1 33%;
+  display: flex;
+}
+.product-card button {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: stretch;
+}
+
+.product-card span {
+  flex: 1;
+}
+.product-card span.product-name {
+  text-align: left;
+}
+.product-card span.product-price {
+  text-align: right;
+}
+
+.product-card .task-button {
+  padding: 10px;
+  outline: none;
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid orangered;
+  color: orangered;
+  text-align: left;
+}

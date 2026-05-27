@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    display: inline-block;
+}
+
+#header {
+}
+
+/* Hamburger Menu Styles */
+.hamburger {
+    display: inline-block;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: max(2vw, 2vh);
+    height: max(2vw, 2vh);
+    position: relative;
+}
+
+.hamburger-line {
+    display: block;
+    width: 100%;
+    height: 20%;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    position: absolute;
+    left: 0;
+}
+
+.hamburger-line:nth-child(1) {
+    top: 0;
+}
+
+.hamburger-line:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hamburger-line:nth-child(3) {
+    bottom: 0;
+}
+
+/* Active/Open state */
+.hamburger.is-active .hamburger-line:nth-child(1) {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.hamburger.is-active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.is-active .hamburger-line:nth-child(3) {
+    bottom: 50%;
+    transform: translateY(50%) rotate(-45deg);
+}
+
+.debug-panel {
+    border: 1px darkgray solid;
+    margin-bottom: 1rem;
+}
+
+.content-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 1rem;
+    column-gap: 1rem;
+}
+
+.content-wrap header {
+    flex: 1 1 100%;
+    display: flex;
+}
+
+.content-wrap main,
+.content-wrap aside {
+    flex: 1;
+}
+
+.content-wrap main {
+    flex-grow: 2;
+}
+
+.content-wrap aside {
+    flex-grow: 1;
+}
+
+.content-wrap footer {
+    flex: 1 1 100%;
+}
+
+dialog {
+    margin: auto;
+    padding: 2rem;
+    width: min(640px, 33%) !important;
+}
+
+dialog h5 {
+}
+
+dialog button {
+    /*display: inline-block !important;*/
+    /*width: auto !important;*/
+    /*border: none;*/
+    /*padding: 0;*/
+}
+
+dialog .dialog-close-cross {
+    text-align: right;
+    margin-bottom: 1rem;
+}
+
+dialog .dialog-buttons {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.dialog-content button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+
+.dialog-content button.cancel {
+    /*background-color: orangered;*/
+    float: left;
+}
+
+.dialog-content button.accept {
+    background-color: darkgreen;
+    float: right;
+}
+
+.dialog-content .close {
+}
+
+.dialog-content .quest-result-success {
+    color: darkgreen;
+}
+.dialog-content .quest-result-success h3::before {
+    content: "\1F44D";
+}
+
+.dialog-content .quest-result-failed {
+    color: red;
+}
+.dialog-content .quest-result-failed h3::before {
+    content: "\1F926";
+}
+
+.content_button {
+    @apply cursor-pointer rounded-sm bg-gray-500 p-1 text-white text-center;
+}
+
+.content_box {
+    @apply bg-gray-300/25 rounded-sm p-2 w-full;
+}
+
+.box_border {
+    @apply border border-gray-300;
+}
+
+.attention {
+    @apply bg-red-700;
+}

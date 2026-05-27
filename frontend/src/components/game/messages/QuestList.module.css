@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+.quest-list {
+    flex-wrap: wrap;
+    align-items: stretch;
+    @apply gap-1 flex items-start text-sm w-100 items-stretch;
+    min-width: stretch;
+}
+
+.quest-card-wrapper {
+    @apply flex flex-row gap-2 items-end justify-between basis-100 sm:basis-xs grow shrink-0;
+}
+
+.quest-card {
+    text-align: left;
+    @apply flex flex-col self-start;
+}
+
+.quest-card .encrypted::after {
+    content: "encrypted";
+    @apply border block border-none text-xs text-red-500;
+}

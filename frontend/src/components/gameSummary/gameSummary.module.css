@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.game_summary_card {
+    @apply text-xs flex flex-col gap-2 basis-auto sm:basis-60 shrink;
+}
