@@ -6,4 +6,4 @@
 
 - `npm run dev`
 
-then open http://localhost:8000
+- open http://localhost:8000
