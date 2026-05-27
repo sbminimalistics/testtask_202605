@@ -43,6 +43,11 @@ export const gamesSlice = createSlice({
             state.push(action.payload);
             saveToLocalStorage(state);
         },
+        removeGame: (state, action) => {
+            const index = state.findIndex(val => val.gameId === action.payload)
+            state.splice(index, 1);
+            saveToLocalStorage(state);
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(
@@ -57,3 +62,5 @@ export const gamesSlice = createSlice({
         );
     },
 });
+
+export const { addGame, removeGame } = gamesSlice.actions;

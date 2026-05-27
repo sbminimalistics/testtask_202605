@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { selectGameId } from "../store/gameInstanceSlice.ts";
 import GameSummaryCard from "../components/gameSummary/GameSummaryCard.tsx";
 import RemoveWithConfirm from "../components/RemoveWithConfirm.tsx";
+import { removeGame } from "../store/gamesSlice.ts";
 
 export default function Games() {
     const { gameId } = useParams();
@@ -34,10 +35,7 @@ export default function Games() {
                                             <RemoveWithConfirm
                                                 id={g.gameId}
                                                 confirmCB={(id) => {
-                                                    console.log(
-                                                        "remove confirmed id:",
-                                                        id
-                                                    );
+                                                    dispatch(removeGame(gameId));
                                                 }}
                                             />
                                             <Link

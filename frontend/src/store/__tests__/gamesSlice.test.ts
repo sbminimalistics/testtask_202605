@@ -43,13 +43,15 @@ describe("gamesSlice", () => {
     });
 
     // ── Reducers ──────────────────────────────────────────────────────────────
-    describe("addGame", () => {
-        it("appends a game summary to the list", () => {
+    describe("addRemoveGame", () => {
+        it("appends and then removes a game summary to the list", () => {
             const store = createStore();
             const summary = sampleSummary();
             store.dispatch(gamesSlice.actions.addGame(summary));
             expect(store.getState().games).toHaveLength(1);
             expect(store.getState().games[0]).toEqual(summary);
+            store.dispatch(gamesSlice.actions.removeGame(summary.gameId));
+            expect(store.getState().games).toHaveLength(0);
         });
 
         it("accumulates multiple games", () => {
