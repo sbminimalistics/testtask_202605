@@ -2,7 +2,7 @@
 
 `npm ci`
 
-duplicate [.env file template](../env/template.env), rename it to .env.development, fill properties inside the file
+duplicate [.env file template](../env/template.env), rename it to `.env.development`, update properties inside the file
 
 `npm run dev`
 
