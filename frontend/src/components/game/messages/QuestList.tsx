@@ -6,14 +6,19 @@ import { hideSpinner, showSpinner } from "../../../store/spinnerSlice.ts";
 
 export default function QuestList() {
     const gameId = useAppSelector((state) => state.gameInstance.gameId);
-    const quests = [...useAppSelector((state) => state.gameInstance.quests)];
+    const storeQuests = useAppSelector((state) => state.gameInstance.quests);
+    console.log("storeQuests:", storeQuests);
+    const quests = [...(storeQuests || [])];
 
     const dispatch = useAppDispatch();
 
     function onRefreshQuestsClick() {
+        if (gameId == null) {
+            return;
+        }
         dispatch(showSpinner());
 
-        dispatch(fetchQuests(gameId!))
+        dispatch(fetchQuests({ gameId: gameId }))
             .unwrap()
             .finally(() => dispatch(hideSpinner()));
     }

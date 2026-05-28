@@ -19,6 +19,10 @@ export type GameInstance = {
     reputation: Reputation;
 };
 
+export type QuestsFetchData = {
+    gameId: string;
+};
+
 export type Quest = {
     adId: string;
     message: string;
@@ -38,7 +42,7 @@ export type QuestResponse = {
     message: string;
 };
 
-export type QuestId = {
+export type QuestSolveData = {
     gameId: string;
     adId: string;
     quest: Quest;
@@ -47,10 +51,10 @@ export type QuestId = {
 export type Product = {
     id: string;
     name: string;
-    cost: string;
+    cost: number;
 };
 
-export type ProductId = {
+export type Purchase = {
     gameId: string;
     itemId: string;
     product: Product;

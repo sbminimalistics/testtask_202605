@@ -1,14 +1,12 @@
 import { useAppSelector } from "./store/store.ts";
 
 import "./styles.css";
-import Spinner from "./components/Spinner";
 import { Link } from "react-router";
 
 export default function StatusBar() {
     const gameInstance = useAppSelector((state) => state.gameInstance);
     const { gameId, gameState } = gameInstance;
     const { lives, gold, level, score, highScore, turn } = gameState;
-    const spinnerVisible = useAppSelector((state) => state.spinner.visible);
 
     return (
         <div
@@ -33,7 +31,7 @@ export default function StatusBar() {
                         {"change game"}
                     </Link>
                 </div>
-                <div className="flex text-gray-500 gap-2">
+                <div className="flex text-gray-500 gap-2 text-base">
                     <div>{`lives: ${lives}`}</div>
                     <div>{`gold: ${gold}`}</div>
                     <div>{`level: ${level}`}</div>
@@ -42,7 +40,6 @@ export default function StatusBar() {
                     <div>{`turn: ${turn}`}</div>
                 </div>
             </div>
-            {spinnerVisible && <Spinner />}
         </div>
     );
 }

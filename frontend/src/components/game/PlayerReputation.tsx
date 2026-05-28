@@ -11,9 +11,12 @@ export default function PlayerReputation() {
     const gameOver = useAppSelector((state) => state.gameInstance.gameOver);
 
     function onInvestigationClick() {
+        if (gameId == null) {
+            return;
+        }
         dispatch(investigateReputation(gameId!))
             .unwrap()
-            .then(() => dispatch(fetchQuests(gameId!)));
+            .then(() => dispatch(fetchQuests({ gameId: gameId })));
     }
 
     return (

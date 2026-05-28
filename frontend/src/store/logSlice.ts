@@ -10,14 +10,21 @@ import { acceptQuest, purchaseItem } from "./thunks";
 
 const STORAGE_KEY = "visual_adventure_log";
 
+export enum LogEntryType {
+    QUEST = "quest",
+    PRODUCT = "product",
+}
+
 export type LogEntry =
     | {
+          type: LogEntryType.QUEST;
           gameId: string;
           requestId: string;
           quest: Quest;
           response?: QuestResponse;
       }
     | {
+          type: LogEntryType.PRODUCT;
           gameId: string;
           requestId: string;
           product: Product;
@@ -49,6 +56,7 @@ export const logSlice = createSlice({
                 console.log(action.type, action);
                 const { quest, gameId } = action.meta.arg;
                 state.unshift({
+                    type: LogEntryType.QUEST,
                     gameId,
                     requestId: action.meta.requestId,
                     quest: quest,
@@ -75,6 +83,7 @@ export const logSlice = createSlice({
                 console.log(action.type, action);
                 const { product, gameId } = action.meta.arg;
                 state.unshift({
+                    type: LogEntryType.PRODUCT,
                     gameId,
                     requestId: action.meta.requestId,
                     product: product,

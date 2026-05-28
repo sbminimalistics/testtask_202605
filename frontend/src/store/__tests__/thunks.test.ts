@@ -98,7 +98,7 @@ describe("fetchQuests thunk", () => {
     it("GETs /:gameId/messages", async () => {
         mockFetchOnce(mockQuests);
         const store = createStoreWithApi();
-        await store.dispatch(fetchQuests(gameId));
+        await store.dispatch(fetchQuests({ gameId }));
 
         expect(global.fetch).toHaveBeenCalledWith(
             `${TEST_API_URL}/${gameId}/messages`
@@ -108,7 +108,7 @@ describe("fetchQuests thunk", () => {
     it("returns a fulfilled action with the quest array", async () => {
         mockFetchOnce(mockQuests);
         const store = createStoreWithApi();
-        const result = await store.dispatch(fetchQuests(gameId));
+        const result = await store.dispatch(fetchQuests({ gameId }));
 
         expect(fetchQuests.fulfilled.match(result)).toBe(true);
         expect(
@@ -119,7 +119,7 @@ describe("fetchQuests thunk", () => {
     it("updates gameInstance.quests in the store", async () => {
         mockFetchOnce(mockQuests);
         const store = createStoreWithApi();
-        await store.dispatch(fetchQuests(gameId));
+        await store.dispatch(fetchQuests({ gameId }));
 
         expect(store.getState().gameInstance.quests).toEqual(mockQuests);
     });
@@ -178,15 +178,26 @@ describe("acceptQuest thunk", () => {
 // ---------------------------------------------------------------------------
 
 describe("purchaseItem thunk", () => {
-    const productId = { gameId: "game-abc", itemId: "sword-of-doom" };
+    const product = {
+        gameId: "game-abc",
+        id: "sword-of-doom",
+        name: "Sword of doom",
+        cost: 50,
+    };
 
     it("POSTs to /:gameId/shop/buy/:itemId", async () => {
         mockFetchOnce(mockPurchaseResponse);
         const store = createStoreWithApi();
-        await store.dispatch(purchaseItem(productId));
+        await store.dispatch(
+            purchaseItem({
+                gameId: product.gameId,
+                itemId: product.id,
+                product,
+            })
+        );
 
         expect(global.fetch).toHaveBeenCalledWith(
-            `${TEST_API_URL}/${productId.gameId}/shop/buy/${productId.itemId}`,
+            `${TEST_API_URL}/${product.gameId}/shop/buy/${product.id}`,
             { method: "post" }
         );
     });
@@ -194,7 +205,13 @@ describe("purchaseItem thunk", () => {
     it("returns a fulfilled action with the purchase response", async () => {
         mockFetchOnce(mockPurchaseResponse);
         const store = createStoreWithApi();
-        const result = await store.dispatch(purchaseItem(productId));
+        const result = await store.dispatch(
+            purchaseItem({
+                gameId: product.gameId,
+                itemId: product.id,
+                product,
+            })
+        );
 
         expect(purchaseItem.fulfilled.match(result)).toBe(true);
         expect(
@@ -205,7 +222,13 @@ describe("purchaseItem thunk", () => {
     it("updates gold and level in the store", async () => {
         mockFetchOnce(mockPurchaseResponse);
         const store = createStoreWithApi();
-        await store.dispatch(purchaseItem(productId));
+        await store.dispatch(
+            purchaseItem({
+                gameId: product.gameId,
+                itemId: product.id,
+                product,
+            })
+        );
 
         const gs = store.getState().gameInstance.gameState;
         expect(gs.gold).toBe(mockPurchaseResponse.gold);
@@ -215,7 +238,13 @@ describe("purchaseItem thunk", () => {
     it("sets gameOver when the response contains lives: 0", async () => {
         mockFetchOnce({ ...mockPurchaseResponse, lives: 0 });
         const store = createStoreWithApi();
-        await store.dispatch(purchaseItem(productId));
+        await store.dispatch(
+            purchaseItem({
+                gameId: product.gameId,
+                itemId: product.id,
+                product,
+            })
+        );
 
         expect(store.getState().gameInstance.gameOver).toBe(true);
     });

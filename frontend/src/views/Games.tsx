@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { resetSelectedGame, selectGameId } from "../store/gameInstanceSlice.ts";
 import GameSummaryCard from "../components/gameSummary/GameSummaryCard.tsx";
 import RemoveWithConfirm from "../components/RemoveWithConfirm.tsx";
-import { removeGame } from "../store/gamesSlice.ts";
+import { GameStatus, removeGame } from "../store/gamesSlice.ts";
 import ViewHeader from "./ViewHeader.tsx";
 
 export default function Games() {
@@ -31,29 +31,46 @@ export default function Games() {
                                 <GameSummaryCard
                                     key={g.gameId}
                                     gameId={g.gameId}
+                                    status={g.status}
                                     cardData={g.state}
                                     children={
-                                        // <div className="flex gap-1 items-end justify-between flex-wrap">
                                         <>
-                                            <RemoveWithConfirm
-                                                id={g.gameId}
-                                                postfix="game"
-                                                confirmCB={(id) => {
-                                                    dispatch(removeGame(id));
-                                                    if (selectedGameId === id) {
+                                            <div className="self-end">
+                                                <RemoveWithConfirm
+                                                    id={g.gameId}
+                                                    postfix="game"
+                                                    confirmCB={(id) => {
                                                         dispatch(
-                                                            resetSelectedGame()
+                                                            removeGame(id)
                                                         );
-                                                    }
-                                                }}
-                                            />
+                                                        if (
+                                                            selectedGameId ===
+                                                            id
+                                                        ) {
+                                                            dispatch(
+                                                                resetSelectedGame()
+                                                            );
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
                                             <Link
-                                                to={`${g.gameId}/messages`}
-                                                className="content_button"
+                                                to={
+                                                    g.status ===
+                                                    GameStatus.RUNNING
+                                                        ? `${g.gameId}/messages`
+                                                        : "#"
+                                                }
+                                                className={
+                                                    "content_button " +
+                                                    (g.status ===
+                                                    GameStatus.RUNNING
+                                                        ? "opacity-100"
+                                                        : "opacity-50")
+                                                }
                                             >
                                                 select
                                             </Link>
-                                            {/* </div> */}
                                         </>
                                     }
                                 />

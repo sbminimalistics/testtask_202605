@@ -5,16 +5,19 @@ import { apiUrlSlice } from "./apiUrlSlice.ts";
 import { gameInstanceSlice } from "./gameInstanceSlice.ts";
 import { gamesSlice } from "./gamesSlice.ts";
 import { logSlice } from "./logSlice.ts";
+import { listenerMiddleware } from "./listenerMiddleware.ts";
 
 export const store = configureStore({
-    reducer: {
-        spinner: spinnerSlice.reducer,
-        gameInstance: gameInstanceSlice.reducer,
-        games: gamesSlice.reducer,
-        api: apiUrlSlice.reducer,
-        log: logSlice.reducer,
-    },
-    devTools: true,
+  reducer: {
+    spinner: spinnerSlice.reducer,
+    gameInstance: gameInstanceSlice.reducer,
+    games: gamesSlice.reducer,
+    api: apiUrlSlice.reducer,
+    log: logSlice.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+  devTools: true,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

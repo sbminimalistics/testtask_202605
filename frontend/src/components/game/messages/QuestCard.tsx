@@ -1,17 +1,14 @@
-import { Quest, QuestResponse } from "../../../types/types.ts";
+import { Quest } from "../../../types/types.ts";
 import { useAppDispatch, useAppSelector } from "../../../store/store.ts";
-import { acceptQuest, fetchQuests } from "../../../store/thunks.ts";
+import { acceptQuest } from "../../../store/thunks.ts";
 import { hideSpinner, showSpinner } from "../../../store/spinnerSlice.ts";
 import { ReactNode, useState } from "react";
-import QuestResponseDialog from "./QuestResponseDialog.tsx";
-import QuestDetailsDialog from "./QuestDetailsDialog.tsx";
 import styles from "./QuestList.module.css";
 import {
     decodeMessage,
     decodeProbability,
     decodeQuestId,
 } from "../../../etc/decode.ts";
-import { toast } from "react-toastify";
 
 type QuestCardProps = {
     quest: Quest;
@@ -45,12 +42,7 @@ function drawComplexity(complexity: string): ReactNode {
 export default function QuestCard({ quest }: QuestCardProps) {
     const dispatch = useAppDispatch();
     const gameId = useAppSelector((state) => state.gameInstance.gameId);
-
-    const [questResponse, setQuestResponse] = useState<QuestResponse | null>(
-        null
-    );
-    const [questDetailsDialog, setQuestDetailsDialog] =
-        useState<boolean>(false);
+    const [isSolving, setIsSolving] = useState(false);
 
     function onAcceptQuestClick(quest: Quest) {
         dispatch(showSpinner());
@@ -59,21 +51,10 @@ export default function QuestCard({ quest }: QuestCardProps) {
             acceptQuest({ gameId: gameId!, adId: decodeQuestId(quest), quest })
         )
             .unwrap()
-            .then((questResponse) => {
-                setQuestResponse(questResponse);
-                setQuestDetailsDialog(false);
-            })
             .catch((error) => {
                 console.error(error);
-                setQuestDetailsDialog(false);
-                // TODO network error dialog
             })
             .finally(() => dispatch(hideSpinner()));
-    }
-
-    function onQuestResponseClose() {
-        setQuestResponse(null);
-        dispatch(fetchQuests(gameId!));
     }
 
     const probability = decodeProbability(quest);
@@ -82,7 +63,11 @@ export default function QuestCard({ quest }: QuestCardProps) {
 
     return (
         <div
-            className={"content_box box_border " + styles["quest-card-wrapper"]}
+            className={
+                "content_box box_border " +
+                styles["quest-card-wrapper"] +
+                (isSolving ? " opacity-40" : "")
+            }
         >
             <div className={styles["quest-card"]}>
                 <div className="flex gap-1 text-xs">
@@ -95,30 +80,14 @@ export default function QuestCard({ quest }: QuestCardProps) {
             </div>
             <button
                 onClick={() => {
-                    toast("attempting to solve...", {
-                        className: "toast_message",
-                    });
-                    setQuestDetailsDialog(true);
+                    onAcceptQuestClick(quest);
+                    setIsSolving(true);
                 }}
                 className="content_button"
+                disabled={isSolving}
             >
                 solve
             </button>
-
-            {questDetailsDialog && (
-                <QuestDetailsDialog
-                    quest={quest}
-                    onCancelQuest={() => setQuestDetailsDialog(false)}
-                    onAcceptQuest={() => onAcceptQuestClick(quest)}
-                />
-            )}
-
-            {questResponse && (
-                <QuestResponseDialog
-                    questResponse={questResponse}
-                    onClose={() => onQuestResponseClose()}
-                />
-            )}
         </div>
     );
 }

@@ -9,6 +9,7 @@ import GameMessagesView from "./views/GameMessagesView.tsx";
 import { ToastContainer } from "react-toastify";
 import ShopView from "./views/ShopView.tsx";
 import ReputationView from "./views/ReputationView.tsx";
+import ToastController from "./components/ToastController.tsx";
 
 export default function App() {
     return (
@@ -34,6 +35,7 @@ export default function App() {
                 </Route>
             </Routes>
             <ToastContainer position="bottom-left" />
+            <ToastController />
         </div>
     );
 }
