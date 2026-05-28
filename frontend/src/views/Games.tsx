@@ -6,6 +6,7 @@ import { resetSelectedGame, selectGameId } from "../store/gameInstanceSlice.ts";
 import GameSummaryCard from "../components/gameSummary/GameSummaryCard.tsx";
 import RemoveWithConfirm from "../components/RemoveWithConfirm.tsx";
 import { removeGame } from "../store/gamesSlice.ts";
+import ViewHeader from "./ViewHeader.tsx";
 
 export default function Games() {
     const { gameId } = useParams();
@@ -24,7 +25,7 @@ export default function Games() {
             {!gameId && (
                 <>
                     <div className="flex flex-col gap-2 content_box">
-                        <div>games started</div>
+                        <ViewHeader title="games started" />
                         <div className="flex flex-col sm:flex-row gap-1 flex-wrap">
                             {games.map((g) => (
                                 <GameSummaryCard
@@ -40,7 +41,9 @@ export default function Games() {
                                                 confirmCB={(id) => {
                                                     dispatch(removeGame(id));
                                                     if (selectedGameId === id) {
-                                                        dispatch(resetSelectedGame());
+                                                        dispatch(
+                                                            resetSelectedGame()
+                                                        );
                                                     }
                                                 }}
                                             />

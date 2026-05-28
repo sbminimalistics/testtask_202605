@@ -1,15 +1,15 @@
-import QuestList from "../components/game/messages/QuestList";
+import PlayerReputation from "../components/game/PlayerReputation";
 import ViewHeader from "./ViewHeader";
 
-export default function GameMessagesView() {
+export default function ReputationView() {
     return (
         <section
             className={
                 "content_box justify-items-start flex flex-col items-start gap-2"
             }
         >
-            <ViewHeader title="messages" />
-            <QuestList />
+            <ViewHeader title="reputation" />
+            <PlayerReputation />
         </section>
     );
 }

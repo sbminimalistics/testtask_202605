@@ -4,6 +4,7 @@ import { spinnerSlice } from "./spinnerSlice.ts";
 import { apiUrlSlice } from "./apiUrlSlice.ts";
 import { gameInstanceSlice } from "./gameInstanceSlice.ts";
 import { gamesSlice } from "./gamesSlice.ts";
+import { logSlice } from "./logSlice.ts";
 
 export const store = configureStore({
     reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
         gameInstance: gameInstanceSlice.reducer,
         games: gamesSlice.reducer,
         api: apiUrlSlice.reducer,
+        log: logSlice.reducer,
     },
     devTools: true,
 });

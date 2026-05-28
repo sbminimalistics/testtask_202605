@@ -49,7 +49,9 @@ describe("startGame thunk", () => {
 
         expect(global.fetch).toHaveBeenCalledWith(
             `${TEST_API_URL}/game/start`,
-            { method: "post" }
+            {
+                method: "post",
+            }
         );
     });
 
@@ -128,7 +130,7 @@ describe("fetchQuests thunk", () => {
 // ---------------------------------------------------------------------------
 
 describe("acceptQuest thunk", () => {
-    const questId = { gameId: "game-abc", adId: "q1" };
+    const questId = { gameId: "game-abc", adId: "q1", quest: mockQuests[0] };
 
     it("POSTs to /:gameId/solve/:adId", async () => {
         mockFetchOnce(mockQuestResponse);

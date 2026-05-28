@@ -11,6 +11,7 @@ import {
     decodeProbability,
     decodeQuestId,
 } from "../../../etc/decode.ts";
+import { toast } from "react-toastify";
 
 type QuestCardProps = {
     quest: Quest;
@@ -54,7 +55,9 @@ export default function QuestCard({ quest }: QuestCardProps) {
     function onAcceptQuestClick(quest: Quest) {
         dispatch(showSpinner());
 
-        dispatch(acceptQuest({ gameId: gameId!, adId: decodeQuestId(quest) }))
+        dispatch(
+            acceptQuest({ gameId: gameId!, adId: decodeQuestId(quest), quest })
+        )
             .unwrap()
             .then((questResponse) => {
                 setQuestResponse(questResponse);
@@ -78,7 +81,9 @@ export default function QuestCard({ quest }: QuestCardProps) {
     const { expiresIn, reward } = quest;
 
     return (
-        <div className={"content_box box_border " + styles["quest-card-wrapper"]}>
+        <div
+            className={"content_box box_border " + styles["quest-card-wrapper"]}
+        >
             <div className={styles["quest-card"]}>
                 <div className="flex gap-1 text-xs">
                     {drawComplexity(normalizeProbabilityName(probability))}
@@ -89,7 +94,12 @@ export default function QuestCard({ quest }: QuestCardProps) {
                 <div>{message}</div>
             </div>
             <button
-                onClick={() => setQuestDetailsDialog(true)}
+                onClick={() => {
+                    toast("attempting to solve...", {
+                        className: "toast_message",
+                    });
+                    setQuestDetailsDialog(true);
+                }}
                 className="content_button"
             >
                 solve

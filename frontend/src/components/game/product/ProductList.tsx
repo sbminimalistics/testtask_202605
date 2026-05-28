@@ -42,20 +42,21 @@ export default function ProductList() {
     }, [fetchProducts, gameId]);
 
     return (
-        <section className={styles["product-list"]}>
-            <h5>
-                Shop{" "}
-                <button
-                    onClick={() => onRefreshShopClick()}
-                    className="content_button"
-                >
-                    refresh
-                </button>
-            </h5>
-            {/*{loading && <div>loading</div>}*/}
-            {products.map((product) => (
-                <ProductCard key={`product-${product.id}`} product={product} />
-            ))}
-        </section>
+        <>
+            <button
+                className="content_button"
+                onClick={() => onRefreshShopClick()}
+            >
+                refresh
+            </button>
+            <div className={styles["product-list"]}>
+                {products.map((product) => (
+                    <ProductCard
+                        key={`product-${product.id}`}
+                        product={product}
+                    />
+                ))}
+            </div>
+        </>
     );
 }

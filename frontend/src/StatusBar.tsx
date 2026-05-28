@@ -13,7 +13,7 @@ export default function StatusBar() {
     return (
         <div
             id="status_bar"
-            className="fixed flex gap-2 text-xs bg-gray-100 p-1 bottom-0 items-center justify-between w-full"
+            className="sticky flex gap-2 text-xs bg-gray-200 p-2 top-0 items-center justify-between w-full"
         >
             <div className="flex flex-col items-center gap-0.5 items-start">
                 <div className="flex items-center gap-2">

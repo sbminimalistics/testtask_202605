@@ -25,7 +25,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     function buyProduct() {
         dispatch(showSpinner());
 
-        dispatch(purchaseItem({ gameId: gameId!, itemId: product.id }))
+        dispatch(purchaseItem({ gameId: gameId!, itemId: product.id, product }))
             .unwrap()
             .then((purchaseResponse) => {
                 setProductPopup(false);
@@ -42,9 +42,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     return (
-        <>
+        <div
+            className={
+                "content_box box_border " + styles["product-card-wrapper"]
+            }
+        >
             <div className={styles["product-card"]}>
-                <button
+                {/* <button
                     onClick={() => onViewClick()}
                     className={styles["task-button"]}
                 >
@@ -54,8 +58,19 @@ export default function ProductCard({ product }: ProductCardProps) {
                     <span className={styles["product-price"]}>
                         {product.cost}
                     </span>
-                </button>
+                </button> */}
+                <div className="text-xs">{`${product.name}`}</div>
+                <div className="text-xs">{`price: ${product.cost}`}</div>
             </div>
+
+            <button
+                onClick={() => {
+                    onViewClick();
+                }}
+                className="content_button"
+            >
+                buy
+            </button>
 
             {productPopup && (
                 <ProductDetailsDialog
@@ -71,6 +86,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                     onClose={() => onPurchaseResponseClose()}
                 />
             )}
-        </>
+        </div>
     );
 }

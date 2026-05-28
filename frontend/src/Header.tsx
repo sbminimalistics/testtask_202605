@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 
 import "./styles.css";
 import { useAppSelector } from "./store/store";
+import StatusBar from "./StatusBar";
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,7 @@ export default function Header() {
     return (
         <div
             id="header"
-            className="sticky flex flex-col gap-2 text-base bg-gray-100 top-0"
+            className="sticky flex flex-col text-base bg-gray-100 top-0 z-99"
         >
             <div className="flex items-center justify-between self-stretch p-2">
                 <span className="text-lg font-semibold text-gray-500 italic">
@@ -70,6 +71,7 @@ export default function Header() {
                     )}
                 </div>
             )}
+            <StatusBar />
         </div>
     );
 }

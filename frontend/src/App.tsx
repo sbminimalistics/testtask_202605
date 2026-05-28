@@ -3,12 +3,12 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 
 import "./styles.css";
 import Header from "./Header.tsx";
-import PlayerReputation from "./components/game/PlayerReputation.tsx";
 import Games from "./views/Games.tsx";
-import StatusBar from "./StatusBar.tsx";
-import ProductList from "./components/game/product/ProductList.tsx";
 import Home from "./views/Home.tsx";
 import GameMessagesView from "./views/GameMessagesView.tsx";
+import { ToastContainer } from "react-toastify";
+import ShopView from "./views/ShopView.tsx";
+import ReputationView from "./views/ReputationView.tsx";
 
 export default function App() {
     return (
@@ -24,15 +24,16 @@ export default function App() {
                             />
                             <Route
                                 path="reputation"
-                                element={<PlayerReputation />}
+                                element={<ReputationView />}
                             />
-                            <Route path="shop" element={<ProductList />} />
+                            <Route path="shop" element={<ShopView />} />
                         </Route>
                     </Route>
 
                     <Route path="*" element={<NoMatch />} />
                 </Route>
             </Routes>
+            <ToastContainer position="bottom-left" />
         </div>
     );
 }
@@ -40,13 +41,11 @@ export default function App() {
 function Layout() {
     return (
         <>
-            {/* <DebugPanel /> */}
             <Header />
 
             <div className="p-4 text-sm">
                 <Outlet />
             </div>
-            <StatusBar />
         </>
     );
 }

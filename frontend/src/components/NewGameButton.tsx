@@ -13,7 +13,7 @@ export default function NewGameButton() {
             .unwrap()
             .then((gameStartResponse) => {
                 navigate(
-                    `/games/${gameStartResponse.gameId}`
+                    `/games/${gameStartResponse.gameId}/messages`
                 );
                 return gameStartResponse;
             })

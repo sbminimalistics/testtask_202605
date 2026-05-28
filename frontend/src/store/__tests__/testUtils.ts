@@ -7,12 +7,12 @@ import { apiUrlSlice } from "../apiUrlSlice";
 import { gameInstanceSlice } from "../gameInstanceSlice";
 import { gamesSlice } from "../gamesSlice";
 import type {
-    GameStartResponse,
-    Quest,
-    QuestResponse,
-    PurchaseResponse,
-    Reputation,
-    GameState,
+  GameStartResponse,
+  Quest,
+  QuestResponse,
+  PurchaseResponse,
+  Reputation,
+  GameState,
 } from "../../types/types";
 
 // ---------------------------------------------------------------------------
@@ -20,84 +20,84 @@ import type {
 // ---------------------------------------------------------------------------
 
 export type TestPreloadedState = Parameters<
-    typeof configureStore
+  typeof configureStore
 >[0]["preloadedState"];
 
 export const createTestStore = (preloadedState?: TestPreloadedState) =>
-    configureStore({
-        reducer: {
-            spinner: spinnerSlice.reducer,
-            gameInstance: gameInstanceSlice.reducer,
-            games: gamesSlice.reducer,
-            api: apiUrlSlice.reducer,
-        },
-        preloadedState,
-    });
+  configureStore({
+    reducer: {
+      spinner: spinnerSlice.reducer,
+      gameInstance: gameInstanceSlice.reducer,
+      games: gamesSlice.reducer,
+      api: apiUrlSlice.reducer,
+    },
+    preloadedState,
+  });
 
 /** A store whose api.apiURL points to the mock server used in thunk tests. */
 export const TEST_API_URL = "http://api.test";
 export const createStoreWithApi = () =>
-    createTestStore({ api: { apiURL: TEST_API_URL } });
+  createTestStore({ api: { apiURL: TEST_API_URL } });
 
 // ---------------------------------------------------------------------------
 // Fixture data
 // ---------------------------------------------------------------------------
 
 export const mockGameState: GameState = {
-    gold: 100,
-    lives: 3,
-    level: 2,
-    score: 500,
-    highScore: 1000,
-    turn: 5,
+  gold: 100,
+  lives: 3,
+  level: 2,
+  score: 500,
+  highScore: 1000,
+  turn: 5,
 };
 
 export const mockGameStartResponse: GameStartResponse = {
-    ...mockGameState,
-    gameId: "game-abc",
+  ...mockGameState,
+  gameId: "game-abc",
 };
 
 export const mockQuests: Quest[] = [
-    {
-        adId: "q1",
-        message: "Create an advertisement campaign",
-        reward: 50,
-        expiresIn: 3,
-        encrypted: 0,
-        probability: "Walk in the park",
-    },
-    {
-        adId: "q2",
-        message: "Create simple add",
-        reward: 120,
-        expiresIn: 1,
-        encrypted: 0,
-        probability: "Rather detrimental",
-    },
+  {
+    adId: "q1",
+    message: "Create an advertisement campaign",
+    reward: 50,
+    expiresIn: 3,
+    encrypted: 0,
+    probability: "Walk in the park",
+  },
+  {
+    adId: "q2",
+    message: "Create simple add",
+    reward: 120,
+    expiresIn: 1,
+    encrypted: 0,
+    probability: "Rather detrimental",
+  },
 ];
 
 export const mockQuestResponse: QuestResponse = {
-    success: true,
-    lives: 3,
-    gold: 150,
-    score: 550,
-    highScore: 1000,
-    turn: 6,
-    message: "Well done!",
+  success: true,
+  lives: 3,
+  gold: 150,
+  score: 550,
+  highScore: 1000,
+  turn: 6,
+  message: "Well done!",
 };
 
 export const mockPurchaseResponse: PurchaseResponse = {
-    shoppingSuccess: true,
-    gold: 50,
-    lives: 4,
-    level: 3,
-    turn: 7,
+  shoppingSuccess: true,
+  gold: 50,
+  lives: 4,
+  level: 3,
+  turn: 7,
 };
 
 export const mockReputation: Reputation = {
-    people: 75,
-    state: 60,
-    underworld: 45,
+  people: 75,
+  state: 60,
+  underworld: 45,
 };
 
 // ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ export const mockReputation: Reputation = {
 // ---------------------------------------------------------------------------
 
 export const mockFetchOnce = (data: unknown): void => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-        json: () => Promise.resolve(data),
-    });
+  (global.fetch as jest.Mock).mockResolvedValueOnce({
+    json: () => Promise.resolve(data),
+  });
 };

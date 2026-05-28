@@ -14,7 +14,6 @@ export default function Home() {
         dispatch(selectGameId(null));
     }, [dispatch, gameId]);
 
-    // const gameId = useAppSelector((state) => state.gameInstance.gameId);
     return (
         <div className="flex flex-col items-start gap-2">
             Visual adventure front-end <ChangeGameButton />

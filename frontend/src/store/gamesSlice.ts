@@ -1,39 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { startGame } from "./thunks";
 import { GameStartResponse, GameState } from "../types/types";
+import { loadFromLocalStorage, saveToLocalStorage } from "./utils/localStorage";
 
 const STORAGE_KEY = "visual_adventure_games";
-
-// interface GamesState {
-//     games: GameSummary[];
-// }
 
 export interface GameSummary {
     gameId: string;
     state: GameState;
 }
 
-const loadFromLocalStorage = (): GameSummary[] => {
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            return JSON.parse(saved);
-        }
-    } catch (error) {
-        console.error("Failed to load games from localStorage:", error);
-    }
-    return [];
-};
-
-const saveToLocalStorage = (games: GameSummary[]) => {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
-    } catch (error) {
-        console.error("Failed to save games to localStorage:", error);
-    }
-};
-
-const initial: GameSummary[] = loadFromLocalStorage();
+const initial: GameSummary[] = loadFromLocalStorage(STORAGE_KEY);
 
 export const gamesSlice = createSlice({
     name: "gamesSlice",
@@ -41,12 +18,12 @@ export const gamesSlice = createSlice({
     reducers: {
         addGame: (state, action) => {
             state.push(action.payload);
-            saveToLocalStorage(state);
+            saveToLocalStorage<GameSummary>(STORAGE_KEY, state);
         },
         removeGame: (state, action) => {
             const index = state.findIndex(val => val.gameId === action.payload)
             state.splice(index, 1);
-            saveToLocalStorage(state);
+            saveToLocalStorage<GameSummary>(STORAGE_KEY, state);
         },
     },
     extraReducers: (builder) => {
@@ -57,7 +34,7 @@ export const gamesSlice = createSlice({
                     gameId: action.payload.gameId,
                     state: action.payload,
                 });
-                saveToLocalStorage(state);
+                saveToLocalStorage<GameSummary>(STORAGE_KEY, state);
             }
         );
     },
