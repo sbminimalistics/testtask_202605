@@ -104,8 +104,11 @@ export const mockReputation: Reputation = {
 // fetch mock helpers
 // ---------------------------------------------------------------------------
 
-export const mockFetchOnce = (data: unknown): void => {
+export const mockFetchOnce = (data: unknown, status = 200): void => {
+  // status is required because thunks.ts now runs every response through
+  // checkResponseNetworkStatus(), which throws unless response.status === 200.
   (global.fetch as jest.Mock).mockResolvedValueOnce({
+    status,
     json: () => Promise.resolve(data),
   });
 };

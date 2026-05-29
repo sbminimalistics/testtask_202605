@@ -71,9 +71,12 @@ describe("startGame thunk", () => {
         const store = createStoreWithApi();
         await store.dispatch(startGame());
 
-        expect(store.getState().gameInstance.gameId).toBe(
-            mockGameStartResponse.gameId
-        );
+        expect(
+            store
+                .getState()
+                .games.filter((g) => g.gameId === mockGameStartResponse.gameId)
+                .length
+        ).toEqual(1);
     });
 
     it("adds an entry to the games list in the store", async () => {

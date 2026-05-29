@@ -3,11 +3,11 @@ import QuestCard from "./QuestCard.tsx";
 import { fetchQuests } from "../../../store/thunks.ts";
 import styles from "./QuestList.module.css";
 import { hideSpinner, showSpinner } from "../../../store/spinnerSlice.ts";
+import { useEffect } from "react";
 
 export default function QuestList() {
     const gameId = useAppSelector((state) => state.gameInstance.gameId);
     const storeQuests = useAppSelector((state) => state.gameInstance.quests);
-    console.log("storeQuests:", storeQuests);
     const quests = [...(storeQuests || [])];
 
     const dispatch = useAppDispatch();
@@ -22,6 +22,13 @@ export default function QuestList() {
             .unwrap()
             .finally(() => dispatch(hideSpinner()));
     }
+
+    useEffect(() => {
+        if (gameId == null) {
+            return;
+        }
+        dispatch(fetchQuests({ gameId: gameId }));
+    }, [gameId, dispatch]);
 
     return (
         <>

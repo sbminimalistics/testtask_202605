@@ -53,7 +53,6 @@ export const logSlice = createSlice({
         builder.addCase(
             acceptQuest.pending,
             (state, action: ReturnType<typeof acceptQuest.pending>) => {
-                console.log(action.type, action);
                 const { quest, gameId } = action.meta.arg;
                 state.unshift({
                     type: LogEntryType.QUEST,
@@ -67,7 +66,6 @@ export const logSlice = createSlice({
         builder.addCase(
             acceptQuest.fulfilled,
             (state, action: ReturnType<typeof acceptQuest.fulfilled>) => {
-                console.log(action.type, action, action.meta);
                 const entry = state.find(
                     (item) => item.requestId === action.meta.requestId
                 );
@@ -78,9 +76,28 @@ export const logSlice = createSlice({
             }
         );
         builder.addCase(
+            acceptQuest.rejected,
+            (state, action: ReturnType<typeof acceptQuest.rejected>) => {
+                const entry = state.find(
+                    (item) => item.requestId === action.meta.requestId
+                );
+                if (entry != null) {
+                    entry.response = {
+                        message: action.error.message ?? "error",
+                        success: false,
+                        lives: 0,
+                        gold: 0,
+                        score: 0,
+                        highScore: 0,
+                        turn: 0,
+                    };
+                }
+                saveToLocalStorage(STORAGE_KEY, state);
+            }
+        );
+        builder.addCase(
             purchaseItem.pending,
             (state, action: ReturnType<typeof purchaseItem.pending>) => {
-                console.log(action.type, action);
                 const { product, gameId } = action.meta.arg;
                 state.unshift({
                     type: LogEntryType.PRODUCT,
@@ -94,12 +111,31 @@ export const logSlice = createSlice({
         builder.addCase(
             purchaseItem.fulfilled,
             (state, action: ReturnType<typeof purchaseItem.fulfilled>) => {
-                console.log(action.type, action, action.meta);
                 const entry = state.find(
                     (item) => item.requestId === action.meta.requestId
                 );
                 if (entry != null) {
                     entry.response = action.payload;
+                }
+                saveToLocalStorage(STORAGE_KEY, state);
+            }
+        );
+        builder.addCase(
+            purchaseItem.rejected,
+            (state, action: ReturnType<typeof purchaseItem.rejected>) => {
+                const entry = state.find(
+                    (item) => item.requestId === action.meta.requestId
+                );
+                if (entry != null) {
+                    entry.response = {
+                        message: action.error.message ?? "error",
+                        success: false,
+                        lives: 0,
+                        gold: 0,
+                        score: 0,
+                        highScore: 0,
+                        turn: 0,
+                    };
                 }
                 saveToLocalStorage(STORAGE_KEY, state);
             }

@@ -14,6 +14,7 @@ import {
     purchaseItem,
     startGame,
 } from "./thunks.ts";
+import { GameStatus } from "./gamesSlice.ts";
 
 const initialGameInstance: GameInstance = {
     gameId: null,
@@ -41,8 +42,14 @@ export const gameInstanceSlice = createSlice({
         gameOver: (state) => {
             state.gameOver = true;
         },
-        selectGameId: (state, action) => {
-            state.gameId = action.payload;
+        selectGame: (state, action) => {
+            state.gameId = action.payload.gameId;
+            state.gameState = {
+                ...(action.payload.state == null
+                    ? initialGameInstance.gameState
+                    : action.payload.state),
+            };
+            state.gameOver = action.payload.status === GameStatus.GAME_OVER;
         },
         resetSelectedGame: (state) => {
             state.gameId = initialGameInstance.gameId;
@@ -53,14 +60,14 @@ export const gameInstanceSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(
-            startGame.fulfilled,
-            (state, action: PayloadAction<GameStartResponse>) => {
-                state.gameId = action.payload.gameId;
-                state.gameState = { ...action.payload };
-                state.gameOver = false;
-            }
-        );
+        // builder.addCase(
+        //     startGame.fulfilled,
+        //     (state, action: PayloadAction<GameStartResponse>) => {
+        //         state.gameId = action.payload.gameId;
+        //         state.gameState = { ...action.payload };
+        //         state.gameOver = false;
+        //     }
+        // );
 
         builder.addCase(
             acceptQuest.fulfilled,
@@ -107,5 +114,5 @@ export const gameInstanceSlice = createSlice({
     },
 });
 
-export const { gameOver, selectGameId, resetSelectedGame } =
+export const { gameOver, selectGame, resetSelectedGame } =
     gameInstanceSlice.actions;

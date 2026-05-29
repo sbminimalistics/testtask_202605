@@ -31,14 +31,16 @@ export default function StatusBar() {
                         {"change game"}
                     </Link>
                 </div>
-                <div className="flex text-gray-500 gap-2 text-base">
-                    <div>{`lives: ${lives}`}</div>
-                    <div>{`gold: ${gold}`}</div>
-                    <div>{`level: ${level}`}</div>
-                    <div>{`score: ${score}`}</div>
-                    <div>{`highscore: ${highScore}`}</div>
-                    <div>{`turn: ${turn}`}</div>
-                </div>
+                {gameId && (
+                    <div className="flex text-gray-500 gap-2 text-base">
+                        <div>{`lives: ${lives}`}</div>
+                        <div>{`gold: ${gold}`}</div>
+                        <div>{`level: ${level}`}</div>
+                        <div>{`score: ${score}`}</div>
+                        <div>{`highscore: ${highScore}`}</div>
+                        <div>{`turn: ${turn}`}</div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -18,6 +18,9 @@ export default function ToastController() {
     const log = useAppSelector((state) => state.log);
 
     useEffect(() => {
+        if (log.length === 0) {
+            return;
+        }
         const entry = log[0];
         let action = "";
         let targetId = "";

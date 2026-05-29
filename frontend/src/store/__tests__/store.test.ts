@@ -9,7 +9,7 @@
 import { store } from "../store";
 import { showSpinner, hideSpinner, isSpinnerVisible } from "../spinnerSlice";
 import { setApiUrl } from "../apiUrlSlice";
-import { gameOver, selectGameId } from "../gameInstanceSlice";
+import { gameOver, selectGame } from "../gameInstanceSlice";
 import { gamesSlice } from "../gamesSlice";
 import { createTestStore } from "./testUtils";
 
@@ -71,7 +71,7 @@ describe("store", () => {
 
         it("selectGameId updates the gameInstance slice", () => {
             const s = createTestStore();
-            s.dispatch(selectGameId("test-game-id"));
+            s.dispatch(selectGame({ gameId: "test-game-id" }));
             expect(s.getState().gameInstance.gameId).toBe("test-game-id");
         });
 

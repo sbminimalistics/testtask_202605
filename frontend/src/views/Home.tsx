@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { selectGameId } from "../store/gameInstanceSlice";
+import { selectGame } from "../store/gameInstanceSlice";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import ChangeGameButton from "../components/ChangeGameButton";
 
@@ -11,7 +11,7 @@ export default function Home() {
         if (gameId == null) {
             return;
         }
-        dispatch(selectGameId(null));
+        dispatch(selectGame({gameId: null}));
     }, [dispatch, gameId]);
 
     return (

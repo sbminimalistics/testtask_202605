@@ -1,8 +1,4 @@
-import {
-    gameInstanceSlice,
-    gameOver,
-    selectGameId,
-} from "../gameInstanceSlice";
+import { gameInstanceSlice, gameOver, selectGame } from "../gameInstanceSlice";
 import {
     startGame,
     acceptQuest,
@@ -63,54 +59,27 @@ describe("gameInstanceSlice", () => {
 
     describe("selectGameId reducer", () => {
         it("stores the provided gameId", () => {
-            const state = reducer(undefined, selectGameId("my-game-123"));
+            const state = reducer(
+                undefined,
+                selectGame({ gameId: "my-game-123" })
+            );
             expect(state.gameId).toBe("my-game-123");
         });
 
         it("can update the gameId to a new value", () => {
-            const after1 = reducer(undefined, selectGameId("game-1"));
-            const after2 = reducer(after1, selectGameId("game-2"));
+            const after1 = reducer(undefined, selectGame({ gameId: "game-1" }));
+            const after2 = reducer(after1, selectGame({ gameId: "game-2" }));
             expect(after2.gameId).toBe("game-2");
         });
 
         it("can set gameId to null", () => {
-            const after1 = reducer(undefined, selectGameId("game-1"));
-            const after2 = reducer(after1, selectGameId(null));
+            const after1 = reducer(undefined, selectGame({ gameId: "game-1" }));
+            const after2 = reducer(after1, selectGame({ gameId: null }));
             expect(after2.gameId).toBeNull();
         });
     });
 
     // ── extraReducers ─────────────────────────────────────────────────────────
-    describe("startGame.fulfilled", () => {
-        const action = startGame.fulfilled(
-            mockGameStartResponse,
-            "reqId",
-            undefined
-        );
-
-        it("stores the gameId from the response", () => {
-            expect(reducer(undefined, action).gameId).toBe("game-abc");
-        });
-
-        it("copies all gameState fields from the response", () => {
-            const state = reducer(undefined, action);
-            expect(state.gameState).toMatchObject({
-                gold: mockGameStartResponse.gold,
-                lives: mockGameStartResponse.lives,
-                level: mockGameStartResponse.level,
-                score: mockGameStartResponse.score,
-                highScore: mockGameStartResponse.highScore,
-                turn: mockGameStartResponse.turn,
-            });
-        });
-
-        it("resets gameOver to false", () => {
-            const gameOverState = reducer(undefined, gameOver());
-            const recovered = reducer(gameOverState, action);
-            expect(recovered.gameOver).toBe(false);
-        });
-    });
-
     describe("fetchQuests.fulfilled", () => {
         it("stores the returned quests array", () => {
             const action = fetchQuests.fulfilled(
