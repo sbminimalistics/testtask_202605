@@ -10,7 +10,6 @@ import {
     QuestsFetchData,
 } from "../types/types";
 import { RootState } from "./store";
-// import { GameStatus, updateGameStatus } from "./gamesSlice";
 
 export enum NetworkStatusErrors {
     GAME_OVER = "game_over",
@@ -50,29 +49,7 @@ export const fetchQuests = createAsyncThunk(
         return fetch(`${apiUrl}/${data.gameId}/messages`)
             .then(checkResponseNetworkStatus)
             .then((response) => response.json())
-            .then((data) => data as Quest[])
-            // .catch((e) => {
-            //     console.error("fetchQuests error:", e.message);
-            //     // return [];
-            //     if (e.message === NetworkStatusErrors.GAME_OVER) {
-            //         // dispatch(
-            //         //     updateGameStatus({
-            //         //         gameId: data.gameId,
-            //         //         gameStatus: GameStatus.GAME_OVER,
-            //         //     })
-            //         // );
-            //         throw new Error("not found");
-            //     } else {
-            //         // 404, 429, ... status codes fall in here
-            //         // dispatch(
-            //         //     updateGameStatus({
-            //         //         gameId: data.gameId,
-            //         //         gameStatus: GameStatus.NOT_AVAILABLE,
-            //         //     })
-            //         // );
-            //         throw new Error("not found");
-            //     }
-            // });
+            .then((data) => data as Quest[]);
     }
 );
 

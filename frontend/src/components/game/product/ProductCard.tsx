@@ -1,5 +1,4 @@
 import { Product } from "../../../types/types.ts";
-import { useState } from "react";
 import { hideSpinner, showSpinner } from "../../../store/spinnerSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../../store/store.ts";
 import { fetchQuests, purchaseItem } from "../../../store/thunks.ts";
@@ -12,7 +11,6 @@ type ProductCardProps = {
 export default function ProductCard({ product }: ProductCardProps) {
     const dispatch = useAppDispatch();
     const gameId = useAppSelector((state) => state.gameInstance.gameId);
-    // const [isPurchasing, setIsPurchasing] = useState(false);
 
     function buyProduct() {
         if (gameId == null) {
@@ -31,9 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     return (
         <div
             className={
-                "content_box box_border " +
-                styles["product-card-wrapper"]
-                // (isPurchasing ? " opacity-40" : "")
+                "content_box box_border " + styles["product-card-wrapper"]
             }
         >
             <div className={styles["product-card"]}>
@@ -44,10 +40,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
                 onClick={() => {
                     buyProduct();
-                    // setIsPurchasing(true);
                 }}
                 className="content_button"
-                // disabled={isPurchasing}
             >
                 buy
             </button>

@@ -13,13 +13,6 @@ export default function NewGameButton() {
         dispatch(showSpinner());
         dispatch(startGame())
             .unwrap()
-            // .then((gameStartResponse) => {
-            //     navigate(`/games/${gameStartResponse.gameId}/messages`);
-            //     return gameStartResponse;
-            // })
-            // .then((gameStartResponse) =>
-            //     dispatch(fetchQuests({ gameId: gameStartResponse.gameId }))
-            // )
             .finally(() => dispatch(hideSpinner()));
     }
 
