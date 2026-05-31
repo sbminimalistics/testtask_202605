@@ -14,7 +14,7 @@ import { decryptMessage } from "./utils/encryption";
 import { addProbabilityWeight } from "./utils/probability";
 
 const STATUS_GAME_OVER = "game over";
-const CONTEMPLATE_BUY_HEAL_ITEM_THRESHOLD = 0;
+const CONTEMPLATE_BUY_HEAL_ITEM_THRESHOLD = 1;
 const CONTEMPLATE_BUY_ITEM_THRESHOLD = 400;
 
 export default class Solver {
@@ -28,6 +28,14 @@ export default class Solver {
 
     constructor(api: string) {
         this._api = api;
+        const notAvailableTransition = transition(
+            "not_available_received",
+            "failed",
+            reduce((ctx: SolverContext, ev: any) => ({
+                ...ctx,
+                game: { ...ctx.game, gameOver: false, available: false },
+            }))
+        );
         this._machine = createMachine({
             idle: state(
                 transition(
@@ -62,9 +70,10 @@ export default class Solver {
                     "failed",
                     reduce((ctx: SolverContext, ev: any) => ({
                         ...ctx,
-                        game: {...ctx.game, gameOver: true},
+                        game: { ...ctx.game, gameOver: true },
                     }))
-                )
+                ),
+                notAvailableTransition
             ),
             loading_messages: invoke(
                 this.fetchEndpoint(`${this._api}/:gameId/messages`),
@@ -79,7 +88,7 @@ export default class Solver {
                             //sort messages asc by complexityWeight
                             .sort(
                                 (a: Message, b: Message) =>
-                                    a.probabilityWeight > b.probabilityWeight
+                                    a.probabilityWeight < b.probabilityWeight
                             ),
                     }))
                 ),
@@ -96,9 +105,10 @@ export default class Solver {
                     "failed",
                     reduce((ctx: SolverContext, ev: any) => ({
                         ...ctx,
-                        game: {...ctx.game, gameOver: true},
+                        game: { ...ctx.game, gameOver: true },
                     }))
-                )
+                ),
+                notAvailableTransition
             ),
             contemplating: invoke(
                 this.contemplate,
@@ -117,7 +127,8 @@ export default class Solver {
                         ...ctx,
                         messageId: ev.data.id,
                     }))
-                )
+                ),
+                transition("finished_solving", "idle")
             ),
             purchasing_item: invoke(
                 this.fetchEndpoint(
@@ -134,7 +145,8 @@ export default class Solver {
                             game: { ...ctx.game, ...rest },
                         };
                     })
-                )
+                ),
+                notAvailableTransition
             ),
             solving_message: invoke(
                 this.fetchEndpoint(`${this._api}/:gameId/solve/:adId`, "POST"),
@@ -148,7 +160,8 @@ export default class Solver {
                             game: { ...ctx.game, ...rest },
                         };
                     })
-                )
+                ),
+                notAvailableTransition
             ),
             solving: state(transition("solved", "solved")),
             solved: state(transition("turned_idle", "idle")),
@@ -162,8 +175,6 @@ export default class Solver {
                     "turned_idle",
                     "idle",
                     action((ctx: SolverContext) => {
-                        console.log("failed > idle:", ctx.game.gameOver);
-                        // this._solveRes(ctx.game);
                         return ctx;
                     })
                 )
@@ -206,15 +217,16 @@ export default class Solver {
             let finalURL = endpointURL.replace(":gameId", ctx.game.gameId);
             finalURL = finalURL.replace(":itemId", ctx.shopItemId);
             finalURL = finalURL.replace(":adId", ctx.messageId);
-            console.log("fetchEndpoint invoked", finalURL);
+            console.log("fetch", finalURL);
             return fetch(finalURL, options)
                 .then((response) => {
-                    // console.log("fetch response:", response);
+                    if (response.status === 404) {
+                        this._service.send("not_available_received" as any);
+                    }
+                    return response;
+                })
+                .then((response) => {
                     if (response.status !== 200 && response.status !== 410) {
-                        console.log(
-                            "fetchEndpoint failed with network status:",
-                            response.status
-                        );
                         throw new Error("non-200 network status");
                     } else {
                         return response;
@@ -222,7 +234,6 @@ export default class Solver {
                 })
                 .then((res) => res.json())
                 .then((res: any) => {
-                    // console.log("fetch response json:", res);
                     const status = res.status?.toLowerCase();
                     if (status === STATUS_GAME_OVER) {
                         this._service.send("game_over_received" as any);
@@ -234,22 +245,21 @@ export default class Solver {
 
     private contemplate = (ctx: SolverContext): Promise<unknown> => {
         // console.log("contemplate on ctx:", ctx);
-        console.log("contemplate on ctx.game:", ctx.game);
+        console.log("score target:", ctx.scoreTarget, "current:", ctx.game.score);
         const healItem = this.findHealingPotion(ctx.shop);
         if (ctx.game.score >= ctx.scoreTarget) {
             this._solveRes(ctx.game);
+            this._service.send("finished_solving" as any);
         } else if (
             ctx.game.lives <= CONTEMPLATE_BUY_HEAL_ITEM_THRESHOLD &&
             healItem != null &&
             healItem.cost <= ctx.game.gold
         ) {
-            // console.log("debug pos0");
             this._service.send({
                 type: "decided_to_shop" as any,
                 data: { id: healItem.id },
             });
         } else if (ctx.game.gold > CONTEMPLATE_BUY_ITEM_THRESHOLD) {
-            // console.log("debug pos1");
             this._service.send({
                 type: "decided_to_shop" as any,
                 data: {
@@ -260,7 +270,6 @@ export default class Solver {
                 },
             });
         } else {
-            // console.log("debug pos2");
             this._service.send({
                 type: "decided_to_solve_message" as any,
                 data: {

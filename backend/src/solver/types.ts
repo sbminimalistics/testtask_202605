@@ -7,6 +7,7 @@ export interface Game {
     highScore: number;
     turn: number;
     gameOver: boolean;
+    available: boolean;
 }
 
 export interface SolveResults {
@@ -28,6 +29,14 @@ export type Message = {
     probability: string;
     probabilityWeight: number;
 };
+
+export type ServiceContext = {
+    scenario: number;
+    scoreTarget: number;
+    interimScoreTarget: number;
+    game: Partial<Game>;
+    scoreTargetSteps: number[];
+}
 
 export type SolverContext = {
     game: Game;
