@@ -9,26 +9,13 @@ import {
     state,
     transition,
 } from "robot3";
+import { Game, Message, ShopItem, SolverContext } from "./types";
+import { decryptMessage } from "./utils/encryption";
+import { addProbabilityWeight } from "./utils/probability";
 
-export interface Game {
-    gameId: string;
-    lives: number;
-    gold: number;
-    level: number;
-    score: number;
-    highScore: number;
-    turn: number;
-}
-
-export interface SolveResults {
-    game: Game;
-}
-
-export interface ShopItem {
-    id: string;
-    name: string;
-    cost: number;
-}
+const STATUS_GAME_OVER = "game over";
+const CONTEMPLATE_BUY_HEAL_ITEM_THRESHOLD = 0;
+const CONTEMPLATE_BUY_ITEM_THRESHOLD = 400;
 
 export default class Solver {
     private _api: string;
@@ -45,29 +32,10 @@ export default class Solver {
             idle: state(
                 transition(
                     "solve",
-                    "loading_messages",
-                    reduce((ctx: object, ev: any) => ({
-                        ...ctx,
-                        ...ev.data,
-                    }))
-                )
-            ),
-            loading_messages: invoke(
-                this.fetchEndpoint(`${this._api}/:gameId/messages`),
-                transition(
-                    "done",
                     "loading_shop",
                     reduce((ctx: object, ev: any) => ({
                         ...ctx,
-                        messages: ev.data,
-                    }))
-                ),
-                transition(
-                    "error",
-                    "failed",
-                    reduce((ctx: object, ev: any) => ({
-                        ...ctx,
-                        messages: [],
+                        ...ev.data,
                     }))
                 )
             ),
@@ -75,7 +43,7 @@ export default class Solver {
                 this.fetchEndpoint(`${this._api}/:gameId/shop`),
                 transition(
                     "done",
-                    "contemplating",
+                    "loading_messages",
                     reduce((ctx: object, ev: any) => ({
                         ...ctx,
                         shop: ev.data,
@@ -87,6 +55,48 @@ export default class Solver {
                     reduce((ctx: object, ev: any) => ({
                         ...ctx,
                         shop: [],
+                    }))
+                ),
+                transition(
+                    "game_over_received",
+                    "failed",
+                    reduce((ctx: SolverContext, ev: any) => ({
+                        ...ctx,
+                        game: {...ctx.game, gameOver: true},
+                    }))
+                )
+            ),
+            loading_messages: invoke(
+                this.fetchEndpoint(`${this._api}/:gameId/messages`),
+                transition(
+                    "done",
+                    "contemplating",
+                    reduce((ctx: object, ev: any) => ({
+                        ...ctx,
+                        messages: ev.data
+                            .map((msg: Message) => decryptMessage(msg))
+                            .map((msg: Message) => addProbabilityWeight(msg))
+                            //sort messages asc by complexityWeight
+                            .sort(
+                                (a: Message, b: Message) =>
+                                    a.probabilityWeight > b.probabilityWeight
+                            ),
+                    }))
+                ),
+                transition(
+                    "error",
+                    "failed",
+                    reduce((ctx: object, ev: any) => ({
+                        ...ctx,
+                        messages: [],
+                    }))
+                ),
+                transition(
+                    "game_over_received",
+                    "failed",
+                    reduce((ctx: SolverContext, ev: any) => ({
+                        ...ctx,
+                        game: {...ctx.game, gameOver: true},
                     }))
                 )
             ),
@@ -116,11 +126,14 @@ export default class Solver {
                 ),
                 transition(
                     "done",
-                    "contemplating",
-                    reduce((ctx: object, ev: any) => ({
-                        ...ctx,
-                        game: { ...ctx.game, ...ev.data },
-                    }))
+                    "loading_messages",
+                    reduce((ctx: SolverContext, ev: any) => {
+                        const { shoppingSuccess, ...rest } = ev.data;
+                        return {
+                            ...ctx,
+                            game: { ...ctx.game, ...rest },
+                        };
+                    })
                 )
             ),
             solving_message: invoke(
@@ -128,36 +141,39 @@ export default class Solver {
                 transition(
                     "done",
                     "loading_messages",
-                    reduce((ctx: object, ev: any) => ({
-                        ...ctx,
-                        game: { ...ctx.game, ...ev.data },
-                    }))
+                    reduce((ctx: SolverContext, ev: any) => {
+                        const { success, message, ...rest } = ev.data;
+                        return {
+                            ...ctx,
+                            game: { ...ctx.game, ...rest },
+                        };
+                    })
                 )
             ),
             solving: state(transition("solved", "solved")),
             solved: state(transition("turned_idle", "idle")),
             failed: invoke(
-                (ctx) => {
-                    this._solveRej(new Error(ctx.error));
+                (ctx: SolverContext) => {
+                    this._solveRes(ctx.game);
                     this._service.send("turned_idle");
                     return Promise.resolve();
                 },
                 transition(
                     "turned_idle",
                     "idle",
-                    action((ctx) => {
-                        console.log("failed > immediate > idle:", ctx);
-                        this._solveRej(ctx.error);
+                    action((ctx: SolverContext) => {
+                        console.log("failed > idle:", ctx.game.gameOver);
+                        // this._solveRes(ctx.game);
                         return ctx;
                     })
                 )
             ),
         });
         this._service = interpret(this._machine, () => {
-            console.log(
-                "Solver state changed to:",
-                this._service.machine.current
-            );
+            // console.log(
+            //     "Solver state changed to:",
+            //     this._service.machine.current
+            // );
         });
     }
 
@@ -166,14 +182,11 @@ export default class Solver {
             return Promise.reject("solver is busy");
         }
         console.log("Solver.solve props:", props);
-        // this._game = props.game;
-        // this._game.score += 1;
-        // this._scoreTarget = props.scoreTarget;
         this._service.send({
             type: "solve",
             data: { game: props.game, scoreTarget: props.scoreTarget },
         });
-        // return Promise.resolve({ game: this._game });
+
         return new Promise((res, rej) => {
             this._solveRes = res;
             this._solveRej = rej;
@@ -197,7 +210,7 @@ export default class Solver {
             return fetch(finalURL, options)
                 .then((response) => {
                     // console.log("fetch response:", response);
-                    if (response.status !== 200) {
+                    if (response.status !== 200 && response.status !== 410) {
                         console.log(
                             "fetchEndpoint failed with network status:",
                             response.status
@@ -207,56 +220,63 @@ export default class Solver {
                         return response;
                     }
                 })
-                .then((res) => res.json());
+                .then((res) => res.json())
+                .then((res: any) => {
+                    // console.log("fetch response json:", res);
+                    const status = res.status?.toLowerCase();
+                    if (status === STATUS_GAME_OVER) {
+                        this._service.send("game_over_received" as any);
+                    }
+                    return res;
+                });
         };
     }
 
-    private contemplate(ctx): Promise<unknown> {
+    private contemplate = (ctx: SolverContext): Promise<unknown> => {
         // console.log("contemplate on ctx:", ctx);
-        console.log("contemplate on ctx:");
+        console.log("contemplate on ctx.game:", ctx.game);
         const healItem = this.findHealingPotion(ctx.shop);
-        console.log("contemplate healItem:", healItem);
-        if (
-            ctx.game.lives < 2 &&
+        if (ctx.game.score >= ctx.scoreTarget) {
+            this._solveRes(ctx.game);
+        } else if (
+            ctx.game.lives <= CONTEMPLATE_BUY_HEAL_ITEM_THRESHOLD &&
             healItem != null &&
             healItem.cost <= ctx.game.gold
         ) {
-            console.log("debug pos0");
+            // console.log("debug pos0");
             this._service.send({
                 type: "decided_to_shop" as any,
                 data: { id: healItem.id },
             });
-        } else if (ctx.game.gold > 400) {
-            console.log("debug pos1");
+        } else if (ctx.game.gold > CONTEMPLATE_BUY_ITEM_THRESHOLD) {
+            // console.log("debug pos1");
             this._service.send({
                 type: "decided_to_shop" as any,
                 data: {
                     //TO-DO: rework short circuit logic
                     id: ctx.shop[
-                        Math.floor(Math.random() * ctx.shop.length) + 1
+                        Math.floor(Math.random() * (ctx.shop.length - 1)) + 1
                     ].id,
                 },
             });
         } else {
-            console.log("debug pos2");
+            // console.log("debug pos2");
             this._service.send({
                 type: "decided_to_solve_message" as any,
                 data: {
-                    //TO-DO: rework short circuit logic
-                    id: ctx.messages[
-                        Math.floor(Math.random() * (ctx.messages.length + 1))
-                    ].adId,
+                    id: ctx.messages[0].adId,
                 },
             });
         }
-        return Promise.resolve(1);
-    }
+        // return Promise.resolve(1);
+        return new Promise(() => {});
+    };
 
-    private findHealingPotion(items: ShopItem[]): ShopItem | undefined {
+    private findHealingPotion = (items: ShopItem[]): ShopItem | undefined => {
         let target = items.find((i) => i.id === "hpot");
         if (target == null) {
             target = items.find((i) => i.name.toLowerCase().indexOf("healing"));
         }
         return target;
-    }
+    };
 }

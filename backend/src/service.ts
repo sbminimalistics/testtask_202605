@@ -13,7 +13,7 @@ import {
     state,
     transition,
 } from "robot3";
-import Solver, { Game, SolveResults } from "./solver/Solver";
+import Solver from "./solver/Solver";
 
 const REATTEMPT_SOLVE_DELAY_MS = 3000;
 
@@ -183,11 +183,20 @@ const serviceMachine = createMachine({
                 );
                 return {
                     ...ctx,
-                    game: evt.data.game,
+                    game: evt.data,
                 };
             })
         ),
-        transition("error" as const, "evaluate_solve_results")
+        transition("error" as const, "evaluate_solve_results", reduce((ctx: any, evt: any) => {
+            console.log(
+                "solve: transition error|evaluate_solve_results",
+                evt.data
+            );
+            return {
+                ...ctx,
+                game: {...ctx.game, gameOver: true},
+            };
+        }))
     ),
     solve_cancelled: invoke(
         () =>
@@ -209,6 +218,14 @@ const serviceMachine = createMachine({
             "ask_start",
             action((ctx, event) => {
                 console.log("Transitioning with:", event);
+                return ctx;
+            })
+        ),
+        transition(
+            "game_over_received" as const,
+            "ask_start",
+            action((ctx: any, event) => {
+                console.log("game over!:", ctx.game);
                 return ctx;
             })
         )
@@ -254,7 +271,10 @@ function createGame() {
     )
         .then((res) => res.json())
         .then((res) => {
-            service.send({ type: "solve" as any, data: { game: res } });
+            service.send({
+                type: "solve" as any,
+                data: { game: { gameOver: false, ...(res as object) } },
+            });
             return 0;
         })
         .catch((err) => {
@@ -275,11 +295,14 @@ function solveGame(): Promise<Game> {
     // };
 }
 
-function evaluateSolveResults() {
+function evaluateSolveResults(): Promise<any> {
     // console.log("evaluateSolveResults ctx:", service.context);
-    const { gameId, lives, gold, level, score, highScore, turn } =
+    const { gameId, lives, gold, level, score, highScore, turn, gameOver } =
         service.context.game;
-    if (lives > 0 && score < service.context.scoreTarget) {
+    console.log("evaluateSolveResults gameOver:", gameOver);
+    if (gameOver === true) {
+        service.send("game_over_received");
+    } else if (lives > 0 && score < service.context.scoreTarget) {
         console.log(
             "evaluateSolveResults score:",
             score,
